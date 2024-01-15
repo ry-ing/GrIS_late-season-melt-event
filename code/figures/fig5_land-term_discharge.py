@@ -49,7 +49,7 @@ def load_discharge_data(gate, skip):
     return discharge_data_resamp, u_err, l_err
 
 ### Load in discharge data ############
-data_dir = 'C:/Users/s1834371/Documents/PhD/melt22/GrIS_late-season-melt-event/data/'
+data_dir = 'C:/Users/s1834371/Documents/GrIS_late-season-melt-event/data/'
 
 skip = 0 
 discharge_IS, uerr_IS, lerr_IS = load_discharge_data('IS', skip)
@@ -227,7 +227,8 @@ axb = ax.twinx()
 axb.bar(melt_data.index, melt_data*100, color='r', zorder=-10, edgecolor='k', linewidth=0.3, width=1, label='Daily Surface Melt 2022')
 axb.set_ylim(0, 20)
 axb.set_yticks([0, 2, 4, 6, 8, 10])
-axb.set_ylabel('Surface Melt (cm w.e. day$^{-1}$)')
+axb.tick_params(axis='y', colors='red')
+axb.set_ylabel('Surface Melt (cm w.e. day$^{-1}$)', color='red')
 axb.legend(fontsize=8,  fancybox=True, framealpha=0.9, facecolor='w', loc='lower right')
 
 ax.set_zorder(1)  
