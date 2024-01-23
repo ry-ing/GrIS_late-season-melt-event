@@ -31,7 +31,7 @@ height = width/1.618 -1
 #-------------------------------------------------
 
 def load_discharge_data(gate, skip):
-    discharge_data = pd.read_csv(data_dir + 'discharge/%s_gate_ice_discharge.csv' % gate, index_col=1)
+    discharge_data = pd.read_csv(data_dir + 'discharge/%s_gate_ice_discharge_BedMachineV5_thickness.csv' % gate, index_col=1)
     discharge_data.index = pd.DatetimeIndex(discharge_data.index, dayfirst=True) # convert to datetime object
     # print(discharge_data.index)
 
@@ -60,7 +60,7 @@ discharge_UNNAMED_SOUTH, uerr_UNNAMED_SOUTH, lerr_UNNAMED_SOUTH = load_discharge
 
 # SUM UP all gates in sector
 sum_sector_discharge = discharge_IS + discharge_RUSSELL + discharge_NORTH_NUNATAK + discharge_SOUTH_NUNATAK + discharge_UNNAMED_SOUTH
-print(sum_sector_discharge)
+#print(sum_sector_discharge)
 #sys.exit()
 #sum_sector_discharge.to_csv('summed_discharge.csv')
 
@@ -70,11 +70,11 @@ for t in range(len(uerr_IS.index)):
     sum_u_error[t] = math.sqrt(uerr_IS[t]**2+ uerr_RUSSELL[t]**2 + uerr_NORTH_NUNATAK[t]**2 + uerr_SOUTH_NUNATAK[t]**2 + uerr_UNNAMED_SOUTH[t]**2)
     sum_l_error[t] = math.sqrt(lerr_IS[t]**2 + lerr_RUSSELL[t]**2 + lerr_NORTH_NUNATAK[t]**2 + lerr_SOUTH_NUNATAK[t]**2 + lerr_UNNAMED_SOUTH[t]**2)
 
-sum_u_error_22 = sum_u_error[(sum_u_error.index >= '2022-04-01') & (sum_u_error.index <= '2023-04-30')]
-sum_l_error_22 = sum_l_error[(sum_l_error.index >= '2022-04-01') & (sum_l_error.index <= '2023-04-30')]
+sum_u_error_22 = sum_u_error[(sum_u_error.index >= '2022-05-01') & (sum_u_error.index <= '2023-04-30')]
+sum_l_error_22 = sum_l_error[(sum_l_error.index >= '2022-05-01') & (sum_l_error.index <= '2023-04-30')]
 
 discharge23 = sum_sector_discharge[(sum_sector_discharge.index >= '2023-04-01') & (sum_sector_discharge.index <= '2023-06-30')]
-discharge22 = sum_sector_discharge[(sum_sector_discharge.index >= '2022-04-01') & (sum_sector_discharge.index <= '2023-04-30')]
+discharge22 = sum_sector_discharge[(sum_sector_discharge.index >= '2022-04-01') & (sum_sector_discharge.index <= '2023-04-30')] # these read 04-01 instead of 05-01 to make april be the first month on the figure
 discharge21 = sum_sector_discharge[(sum_sector_discharge.index >= '2021-04-01') & (sum_sector_discharge.index <= '2022-04-30')]
 discharge20 = sum_sector_discharge[(sum_sector_discharge.index >= '2020-04-01') & (sum_sector_discharge.index <= '2021-04-30')]
 discharge19 = sum_sector_discharge[(sum_sector_discharge.index >= '2019-04-01') & (sum_sector_discharge.index <= '2020-04-30')]
@@ -83,7 +83,7 @@ discharge17 = sum_sector_discharge[(sum_sector_discharge.index >= '2017-04-01') 
 discharge16 = sum_sector_discharge[(sum_sector_discharge.index >= '2016-04-01') & (sum_sector_discharge.index <= '2017-04-30')]
 
 # calculating increase due to melt event
-discharge22_df = discharge22[(discharge22.index >= '2022-05-01') & (discharge22.index <= '2023-04-30')]
+discharge22_df = discharge22[(discharge22.index >= '2022-05-01') & (discharge22.index <= '2023-04-30')] # 05-01 to 04-30, 1 year May to May
 discharge22_df['upper_err'] = sum_u_error_22
 discharge22_df['lower_err'] = sum_l_error_22
 discharge22_df['upp_discharge'] = discharge22_df['discharge'] + discharge22_df['upper_err']
@@ -95,7 +95,8 @@ annual_totals = annual_totals.sum()
 annual = annual_totals['discharge']
 annual_upper_error = annual_totals['upper_err']
 annual_lower_error = annual_totals['lower_err']
-
+#print(discharge22_df)
+#sys.exit()
 #----------------------------------------------
 nomelt_discharge = discharge22_df[(discharge22_df.index < '2022-08-20') | (discharge22_df.index > '2022-09-15')] 
 nomelt_discharge = nomelt_discharge.resample('D').interpolate()
@@ -175,6 +176,7 @@ fig = plt.figure()
 spec = gridspec.GridSpec(ncols=1, nrows=1)
 
 ax = fig.add_subplot(spec[0])
+ax.set_title('Using BedMachineV5 thickness')
 
 melt_start = pd.to_datetime('2022-08-21')
 melt_end = pd.to_datetime('2022-09-14') 
@@ -186,9 +188,8 @@ ax.yaxis.set_tick_params(which='major', size=5, width=1, direction='in', right='
 ax.yaxis.set_tick_params(which='minor', size=5, width=1, direction='in', right='on')
 
 comb_error = [sum_l_error_22.values, sum_u_error_22.values]
-print(discharge22)
 
-ax.errorbar(discharge22.index, discharge22['discharge'], yerr=comb_error, zorder=1, ls='none', elinewidth=1.26, ecolor='dodgerblue', alpha=0.2, label='2022/23 error')
+#ax.errorbar(discharge22.index, discharge22['discharge'], yerr=comb_error, zorder=1, ls='none', elinewidth=1.26, ecolor='dodgerblue', alpha=0.2, label='2022/23 error')
 ax.plot(discharge22.index, discharge22['discharge'], color='k', zorder=2, linewidth=2)
 ax.plot(discharge22.index, discharge22['discharge'], color='#29B6F6', zorder=2, label='2022/23', linewidth=1.5)
 
@@ -239,5 +240,5 @@ ax.patch.set_visible(False)
 fig.set_size_inches(width, height)
 
 root = os.getcwd()
-fig.savefig(root + '/code/figures/fig5_discharge_land.jpg', dpi=400, bbox_inches='tight')
+fig.savefig(root + '/code/figures/fig5_discharge_land_exp.jpg', dpi=400, bbox_inches='tight')
 plt.show()
