@@ -31,7 +31,7 @@ height = width/1.618 -1
 #-------------------------------------------------
 
 def load_discharge_data(gate, skip):
-    discharge_data = pd.read_csv(data_dir + 'discharge/%s_gate_ice_discharge.csv' % gate, index_col=1)
+    discharge_data = pd.read_csv(data_dir + 'discharge/%s_gate_ice_discharge_v2.csv' % gate, index_col=1)
     discharge_data.index = pd.DatetimeIndex(discharge_data.index, dayfirst=True) # convert to datetime object
     # print(discharge_data.index)
 
@@ -60,9 +60,8 @@ discharge_UNNAMED_SOUTH, uerr_UNNAMED_SOUTH, lerr_UNNAMED_SOUTH = load_discharge
 
 # SUM UP all gates in sector
 sum_sector_discharge = discharge_IS + discharge_RUSSELL + discharge_NORTH_NUNATAK + discharge_SOUTH_NUNATAK + discharge_UNNAMED_SOUTH
-print(sum_sector_discharge)
-#sys.exit()
-#sum_sector_discharge.to_csv('summed_discharge.csv')
+
+sum_sector_discharge.to_csv('summed_discharge.csv')
 
 sum_u_error = uerr_IS.copy() # copy pd dataframe strucutre
 sum_l_error = lerr_IS.copy() # copy pd dataframe strucutre
@@ -74,7 +73,7 @@ sum_u_error_22 = sum_u_error[(sum_u_error.index >= '2022-04-01') & (sum_u_error.
 sum_l_error_22 = sum_l_error[(sum_l_error.index >= '2022-04-01') & (sum_l_error.index <= '2023-04-30')]
 
 discharge23 = sum_sector_discharge[(sum_sector_discharge.index >= '2023-04-01') & (sum_sector_discharge.index <= '2023-06-30')]
-discharge22 = sum_sector_discharge[(sum_sector_discharge.index >= '2022-04-01') & (sum_sector_discharge.index <= '2023-04-30')]
+discharge22 = sum_sector_discharge[(sum_sector_discharge.index >= '2022-04-01') & (sum_sector_discharge.index <= '2023-04-30')] # these read 04-01 instead of 05-01 to make april be the first month on the figure
 discharge21 = sum_sector_discharge[(sum_sector_discharge.index >= '2021-04-01') & (sum_sector_discharge.index <= '2022-04-30')]
 discharge20 = sum_sector_discharge[(sum_sector_discharge.index >= '2020-04-01') & (sum_sector_discharge.index <= '2021-04-30')]
 discharge19 = sum_sector_discharge[(sum_sector_discharge.index >= '2019-04-01') & (sum_sector_discharge.index <= '2020-04-30')]
@@ -83,7 +82,7 @@ discharge17 = sum_sector_discharge[(sum_sector_discharge.index >= '2017-04-01') 
 discharge16 = sum_sector_discharge[(sum_sector_discharge.index >= '2016-04-01') & (sum_sector_discharge.index <= '2017-04-30')]
 
 # calculating increase due to melt event
-discharge22_df = discharge22[(discharge22.index >= '2022-05-01') & (discharge22.index <= '2023-04-30')]
+discharge22_df = discharge22[(discharge22.index >= '2022-05-01') & (discharge22.index <= '2023-04-30')] # 05-01 to 04-30, 1 year May to May
 discharge22_df['upper_err'] = sum_u_error_22
 discharge22_df['lower_err'] = sum_l_error_22
 discharge22_df['upp_discharge'] = discharge22_df['discharge'] + discharge22_df['upper_err']
@@ -131,7 +130,6 @@ discharge_dictionary['2017'] = discharge17
 discharge_dictionary['2016'] = discharge16
 
 
-print(discharge_dictionary)
 key_list = list(discharge_dictionary.keys())
 annual_mean_list = []
 for key in key_list:
@@ -141,6 +139,9 @@ for key in key_list:
     annual_mean_list.append(annual_mean)
 
 annual_mean_list = np.array([annual_mean_list])
+
+print('\nSTATS:')
+print('Increase:', annual - annual_nomelt)
 print('All years STD', annual_mean_list.std())
 print('All years MEAN', annual_mean_list.mean())
 
@@ -171,6 +172,7 @@ melt_data = melt_data['2022']
 melt_data = melt_data[(melt_data.index >= '2022-05-01') & (melt_data.index <= '2023-04-30')]
 
 #######################creating figure########################################
+plt.close('all')
 fig = plt.figure()
 spec = gridspec.GridSpec(ncols=1, nrows=1)
 
@@ -186,18 +188,17 @@ ax.yaxis.set_tick_params(which='major', size=5, width=1, direction='in', right='
 ax.yaxis.set_tick_params(which='minor', size=5, width=1, direction='in', right='on')
 
 comb_error = [sum_l_error_22.values, sum_u_error_22.values]
-print(discharge22)
 
 ax.errorbar(discharge22.index, discharge22['discharge'], yerr=comb_error, zorder=1, ls='none', elinewidth=1.26, ecolor='dodgerblue', alpha=0.2, label='2022/23 error')
 ax.plot(discharge22.index, discharge22['discharge'], color='k', zorder=2, linewidth=2)
 ax.plot(discharge22.index, discharge22['discharge'], color='#29B6F6', zorder=2, label='2022/23', linewidth=1.5)
 
-ax.plot(discharge21.index, discharge21, color='grey', zorder=1, alpha=0.5, label='Individual years \n2016 to 2022')
+ax.plot(discharge21.index, discharge21, color='grey', zorder=1, alpha=0.5)
 ax.plot(discharge20.index, discharge20, color='grey', zorder=1, alpha=0.5)
 ax.plot(discharge19.index, discharge19, color='grey', zorder=1, alpha=0.5)
 ax.plot(discharge18.index, discharge18, color='grey', zorder=1, alpha=0.5)
 ax.plot(discharge17.index, discharge17, color='grey', zorder=1, alpha=0.5)
-ax.plot(discharge16.index, discharge16, color='grey', zorder=1, alpha=0.5)
+ax.plot(discharge16.index, discharge16, color='grey', zorder=1, alpha=0.5, label='Individual years \n2016 to 2022')
 
 ax.plot(discharge22.index, discharge_median, zorder=1, color='k', alpha=0.6, linewidth=2, label='2016 to 2022 median')
 
@@ -239,5 +240,5 @@ ax.patch.set_visible(False)
 fig.set_size_inches(width, height)
 
 root = os.getcwd()
-fig.savefig(root + '/code/figures/fig5_discharge_land.jpg', dpi=400, bbox_inches='tight')
+fig.savefig(root + '/code/figures/fig5_discharge_land_v2.jpg', dpi=400, bbox_inches='tight')
 plt.show()
