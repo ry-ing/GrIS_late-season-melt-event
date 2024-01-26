@@ -202,7 +202,7 @@ ax.plot(discharge16.index, discharge16, color='grey', zorder=1, alpha=0.5, label
 
 ax.plot(discharge22.index, discharge_median, zorder=1, color='k', alpha=0.6, linewidth=2, label='2016 to 2022 median')
 
-ax.legend(loc='upper right', fontsize=8,  fancybox=True, framealpha=0.9, facecolor='w')
+#ax.legend(loc='upper right', fontsize=8,  fancybox=True, framealpha=0.9, facecolor='w')
 ax.set_ylabel('Ice Discharge (Gt yr$^{-1}$)')
 
 bbox_props = dict(boxstyle="round", fc="w", ec="0.5", alpha=0.9)

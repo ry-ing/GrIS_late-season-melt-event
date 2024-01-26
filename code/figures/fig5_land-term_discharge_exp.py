@@ -27,11 +27,11 @@ plt.rc('figure', titlesize=title_fontsize)  # fontsize of the figure title
 plt.rcParams['axes.facecolor'] = 'None'
 
 width = 6.88 
-height = width/1.618 -1 
+height = width/1.618 
 #-------------------------------------------------
 
 def load_discharge_data(gate, skip):
-    discharge_data = pd.read_csv(data_dir + 'discharge/%s_gate_ice_discharge_BedMachineV5_thickness.csv' % gate, index_col=1)
+    discharge_data = pd.read_csv(data_dir + 'discharge/%s_gate_ice_discharge_v5.csv' % gate, index_col=1)
     discharge_data.index = pd.DatetimeIndex(discharge_data.index, dayfirst=True) # convert to datetime object
     # print(discharge_data.index)
 
@@ -176,7 +176,7 @@ fig = plt.figure()
 spec = gridspec.GridSpec(ncols=1, nrows=1)
 
 ax = fig.add_subplot(spec[0])
-ax.set_title('Using BedMachineV5 thickness')
+ax.set_title('Alternative gates')
 
 melt_start = pd.to_datetime('2022-08-21')
 melt_end = pd.to_datetime('2022-09-14') 
@@ -189,7 +189,7 @@ ax.yaxis.set_tick_params(which='minor', size=5, width=1, direction='in', right='
 
 comb_error = [sum_l_error_22.values, sum_u_error_22.values]
 
-#ax.errorbar(discharge22.index, discharge22['discharge'], yerr=comb_error, zorder=1, ls='none', elinewidth=1.26, ecolor='dodgerblue', alpha=0.2, label='2022/23 error')
+ax.errorbar(discharge22.index, discharge22['discharge'], yerr=comb_error, zorder=1, ls='none', elinewidth=1.26, ecolor='dodgerblue', alpha=0.2, label='2022/23 error')
 ax.plot(discharge22.index, discharge22['discharge'], color='k', zorder=2, linewidth=2)
 ax.plot(discharge22.index, discharge22['discharge'], color='#29B6F6', zorder=2, label='2022/23', linewidth=1.5)
 
@@ -240,5 +240,5 @@ ax.patch.set_visible(False)
 fig.set_size_inches(width, height)
 
 root = os.getcwd()
-fig.savefig(root + '/code/figures/fig5_discharge_land_exp.jpg', dpi=400, bbox_inches='tight')
+fig.savefig(root + '/code/figures/fig5_discharge_land_exp_v3.jpg', dpi=400, bbox_inches='tight')
 plt.show()
