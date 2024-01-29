@@ -49,7 +49,7 @@ def load_discharge_data(gate, skip):
     return discharge_data_resamp, u_err, l_err
 
 ### Load in discharge data ############
-data_dir = 'C:/Users/s1834371/Documents/GrIS_late-season-melt-event/data/'
+data_dir = 
 
 skip = 0 
 discharge_IS, uerr_IS, lerr_IS = load_discharge_data('IS', skip)

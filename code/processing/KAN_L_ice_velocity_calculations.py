@@ -140,10 +140,6 @@ def calculate_ice_velocity(MET_DATA, start_date, end_date, save_csv, save_fig, p
         print(ice_velocity_1)
         print(vel_error_1)
 
-        # if i==10:
-        #     sys.exit()
-            
-    print(len(ice_velocity))
 
     
     if save_csv=='True':       
